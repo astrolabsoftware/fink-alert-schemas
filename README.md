@@ -2,6 +2,37 @@
 
 Apache Avro uses a schema to structure the data (define data types and protocols) that is being encoded (compact binary format). It has two different types of schema languages: one for human editing (Avro IDL) and another which is more machine-readable based on (JSON).
 
+## Generate LSST test data
+
+Go on the cluster, and extract 100 alerts:
+
+```bash
+cd generate_rubin_test_data/
+
+# Edit extract_test_data_rubin.py
+./run.sh
+```
+
+Extract data from HDFS and split avro files:
+
+```bash
+export PYTHONPATH=$PYTHONPATH:~/codes/fink-alert-simulator/rootfs/fink/
+python split_avro.py
+```
+
+Then rename the avro folder:
+
+```bash
+rm -r rubin_test_data_9_0.avro
+mv rubin_test_data_9_0.avro_tmp rubin_test_data_9_0_avro
+mv rubin_test_data_9_0* ../datasim
+```
+
+Finally merge data, and update fink-broker to get the change:
+
+1. Change schema `FINK_ALERT_SCHEMA` in the configuration files
+2. Change version in all unit test files
+3. Update clone in `Dockerfile` and `.github/workflows/test.yml` if need be.
 
 ## ZTF alert schema timeline
 
